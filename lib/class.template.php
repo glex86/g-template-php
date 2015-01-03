@@ -1,10 +1,7 @@
 <?php
-
-/*
- * Project:	template_lite, a smarter template engine
- * File:	class.template.php
- * Author:	Paul Lockaby <paul@paullockaby.com>, Mark Dickenson <akapanamajack@sourceforge.net>
- * Copyright:	2003,2004,2005 by Paul Lockaby, 2005,2006 Mark Dickenson
+/**
+ * Project:     G-Template Engine
+ * File:        class.compiler.php
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +17,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * The latest version of template_lite can be obtained from:
- * http://templatelite.sourceforge.net
- *
+ * @link https://github.com/glex86/g-template-php
+ * @author Tamas David (G-Lex) <glex at mittudomain.info>
+ * @author Monte Ohrt <monte at ohrt.com>
+ * @author Andrei Zmievski <andrei at php.net>
+ * @author Paul Lockaby <paul at paullockaby.com>
+ * @author Mark Dickenson <akapanamajack at sourceforge.net>
+ * 
+ * @version 0.9
  */
 
 if (!defined('G_TEMPLATE_BASE')) {
@@ -32,8 +34,8 @@ if (!defined('G_TEMPLATE_BASE')) {
 class gTemplate {
     const DS                            = DIRECTORY_SEPARATOR;
     const NAME                          = 'G-Template Engine';
-    const VERSION                       = '0.8';
-    const CREATED                       = '2014-12-22';        
+    const VERSION                       = '0.9';
+    const CREATED                       = '2015-01-03';        
 
     // public configuration variables
     var $left_delimiter              = '<{';                 // the left delimiter for template tags

@@ -28,6 +28,7 @@ If I move the template resources to memcache or something else I need to give up
 The builtin OpCache do some filesystem caching and OptIns but it wasn't enough for me :)
 
 In the latest 7.0.4 version I found the solution: the opcache_is_script_cached() and opcache_compile_file() functions
+
 Smarty do a lot of file_exists and filemtime() queries to the filesystem to validate the compiled resource against the tpl file.
 So If you fetch a compiled template the Zend OpCaches saves the binary opcodes into the memory.
 If you modify the compiled resource file the OpCache invalidates the currently cached opcode.
