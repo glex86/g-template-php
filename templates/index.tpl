@@ -1,6 +1,9 @@
 <{config_load file="test.conf"}>
 <{include file="header.tpl" title=foo}>
 
+<{$valami|default:"Valami default"}>
+
+<h1><{$glexobj->v1}></h1>
 
 <PRE>
 <{literal}>
@@ -29,7 +32,6 @@ variable modifier example of <{ldelim}>$Name|upper<{rdelim}>
 
 <b><{$Name|upper}></b>
 
-
 An example of a section loop:
 
 <{section name=outer loop=$FirstName}>
@@ -54,7 +56,6 @@ An example of section looped key values:
 An example of foreach looped key values:
 <p>
 <{foreach from=$contacts item=item name=alfa}>
-#<{{alfa.iteration}}>#
     phone1: <{$item.phone}><br>
     fax1: <{$item.fax}><br>
     cell1: <{$item.cell}><br>
@@ -278,4 +279,7 @@ abcdefghijklmnopqrstuvwxyz
 abcdefghijklmnopqrstuvwxyz
 <{$foo_49|json_encode}>
 
+<{include file="test.tpl"}>
+
 <{include file="footer.tpl"}>
+

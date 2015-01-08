@@ -1,7 +1,7 @@
 <?php
 /**
  * Project:     G-Template Engine
- * File:        class.compiler.php
+ * File:        class.template.php
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,8 +34,8 @@ if (!defined('G_TEMPLATE_BASE')) {
 class gTemplate {
     const DS                            = DIRECTORY_SEPARATOR;
     const NAME                          = 'G-Template Engine';
-    const VERSION                       = '0.9';
-    const CREATED                       = '2015-01-03';
+    const VERSION                       = '1.0';
+    const CREATED                       = '2015-01-08';
 
     var $useRealpath                    = true;
 
@@ -116,6 +116,21 @@ class gTemplate {
     function assignByRef($key, $value) {
         if ($key != '') {
             $this->_vars[$key] = &$value;
+        }
+    }
+
+    function append($key, $value = null, $merge = false) {
+        if ($key != '' && isset($value)) {
+            if (!@is_array($this->_vars[$key])) {
+                settype($this->_vars[$key], 'array');
+            }
+            if ($merge && is_array($value)) {
+                foreach ($value as $_mergekey => $_mergevalue) {
+                    $this->_vars[$key][$_mergekey] = $_mergevalue;
+                }
+            } else {
+                $this->_vars[$key][] = $value;
+            }
         }
     }
 

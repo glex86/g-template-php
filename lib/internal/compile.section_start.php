@@ -24,10 +24,10 @@ function compile_section_start($attrs, &$gTpl) {
             $gTpl->trigger_error("[SYNTAX] missing 'loop' attribute in 'section' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
         }
 
-        $output .= "\$gTpl->_sections[$section_name] = array();\n";
+        $output .= "\$gTpl->_sections['$section_name'] = array();\n";
         $section_props = "\$gTpl->_sections['$section_name']";
 
-        $output .= '/* Setting predefined attributes */'."\n";
+        //$output .= '/* Setting predefined attributes */'."\n";
         foreach ($attrs as $attr_name => $attr_value) {
             switch ($attr_name) {
                 case 'name': break;
@@ -59,8 +59,8 @@ function compile_section_start($attrs, &$gTpl) {
             }
         }
 
-        $output .= '/* END of Setting predefined attributes */'."\n";
-        $output .= "\n".'/* Setting default values for attributes */'."\n";
+        //$output .= '/* END of Setting predefined attributes */'."\n";
+        //$output .= "\n".'/* Setting default values for attributes */'."\n";
 
         if (!isset($attrs['show']))
             $output .= "{$section_props}['show'] = true;\n";
@@ -86,8 +86,8 @@ function compile_section_start($attrs, &$gTpl) {
                        "    {$section_props}['start'] = min({$section_props}['start'], {$section_props}['step'] > 0 ? {$section_props}['loop'] : {$section_props}['loop']-1);\n";
         }
 
-        $output .= "/* Determine Total loops */\n"
-                  ."if ({$section_props}['show']) {\n";
+        //$output .= "/* Determine Total loops */\n"
+        $output .= "if ({$section_props}['show']) {\n";
         if (!isset($attrs['start']) && !isset($attrs['step']) && !isset($attrs['max'])) {
             $output .= "    {$section_props}['total'] = {$section_props}['loop'];\n";
         } else {
@@ -98,8 +98,8 @@ function compile_section_start($attrs, &$gTpl) {
                    "} else\n" .
                    "    {$section_props}['total'] = 0;\n";
 
-    $output .= "/* END of Determine Total loops */\n";
-        $output .= '/* END of Setting default values for attributes */'."\n";
+        //$output .= "/* END of Determine Total loops */\n";
+        //$output .= '/* END of Setting default values for attributes */'."\n";
 
         $output .= "if ({$section_props}['show']):";
 
