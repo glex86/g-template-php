@@ -7,20 +7,20 @@
  * @subpackage internalFunctions
  */
 
-function compile_compile_if($arguments, $elseif, $while, &$object) {
+function compile_compile_if($arguments, $elseif, $while, &$gTpl) {
     $_result = "";
     $_match = array();
     $_args = array();
     $_is_arg_stack = array();
 
     // extract arguments from the equation
-    preg_match_all('/(?>('.$object->_obj_call_regexp.'|' . $object->_var_regexp . '|\/?' . $object->_svar_regexp . '|\/?' . $object->_fvar_regexp . '|\/?' . $object->_func_regexp . ')(?:' . $object->_mod_regexp . '*)?|\-?0[xX][0-9a-fA-F]+|\-?\d+(?:\.\d+)?|\.\d+|!==|===|==|!=|<>|<<|>>|<=|>=|\&\&|\|\||\(|\)|,|\!|\^|=|\&|\~|<|>|\%|\+|\-|\/|\*|\@|\b\w+\b|\S+)/x', $arguments, $_match);
+    preg_match_all('/(?>('.$gTpl->_obj_call_regexp.'|' . $gTpl->_var_regexp . '|\/?' . $gTpl->_svar_regexp . '|\/?' . $gTpl->_fvar_regexp . '|\/?' . $gTpl->_func_regexp . ')(?:' . $gTpl->_mod_regexp . '*)?|\-?0[xX][0-9a-fA-F]+|\-?\d+(?:\.\d+)?|\.\d+|!==|===|==|!=|<>|<<|>>|<=|>=|\&\&|\|\||\(|\)|,|\!|\^|=|\&|\~|<|>|\%|\+|\-|\/|\*|\@|\b\w+\b|\S+)/x', $arguments, $_match);
     $_args = $_match[0];
 
     // make sure we have balanced parenthesis
     $_args_count = array_count_values($_args);
     if (isset($_args_count['(']) && $_args_count['('] != $_args_count[')']) {
-        $object->trigger_error("[SYNTAX] unbalanced parenthesis in if statement", E_USER_ERROR, $object->_file, $object->_linenum);
+        $gTpl->trigger_error("[SYNTAX] unbalanced parenthesis in if statement", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
     }
 
     $count_args = count($_args);
@@ -95,16 +95,16 @@ function compile_compile_if($arguments, $elseif, $while, &$object) {
                 } else {
                     $_is_arg_count = count($_args);
                     $is_arg = implode(' ', array_slice($_args, $is_arg_start, $i - $is_arg_start));
-                    $_arg_tokens = $object->_parse_is_expr($is_arg, array_slice($_args, $i + 1));
+                    $_arg_tokens = $gTpl->_parse_is_expr($is_arg, array_slice($_args, $i + 1));
                     array_splice($_args, $is_arg_start, count($_args), $_arg_tokens);
                     $i = $_is_arg_count - count($_args);
                 }
                 break;
             default:
-                preg_match('/(?:('.$object->_obj_call_regexp.'|' . $object->_var_regexp . '|' . $object->_svar_regexp . '|' . $object->_func_regexp . ')(' . $object->_mod_regexp . '*)(?:\s*[,\.]\s*)?)(?:\s+(.*))?/xs', $_arg, $_match);
+                preg_match('/(?:('.$gTpl->_obj_call_regexp.'|' . $gTpl->_var_regexp . '|' . $gTpl->_svar_regexp . '|' . $gTpl->_func_regexp . ')(' . $gTpl->_mod_regexp . '*)(?:\s*[,\.]\s*)?)(?:\s+(.*))?/xs', $_arg, $_match);
                 if (isset($_match[0]{0}) && ($_match[0]{0} == '$' || ($_match[0]{0} == '#' && $_match[0]{strlen($_match[0]) - 1} == '#') || $_match[0]{0} == "'" || $_match[0]{0} == '"' || $_match[0]{0} == '%')) {
                     // process a variable
-                    $_arg = $object->_parse_variables(array($_match[1]), array($_match[2]));
+                    $_arg = $gTpl->_parse_variables(array($_match[1]), array($_match[2]));
                 } elseif (is_numeric($_arg)) {
                     // pass the number through
                 } elseif (function_exists($_match[0]) || $_match[0] == "empty" || $_match[0] == "isset" || $_match[0] == "unset" || strtolower($_match[0]) == "true" || strtolower($_match[0]) == "false" || strtolower($_match[0]) == "null") {
@@ -112,7 +112,7 @@ function compile_compile_if($arguments, $elseif, $while, &$object) {
                 } elseif (empty($_arg)) {
                     // pass the empty argument through
                 } else {
-                    $object->trigger_error("[SYNTAX] unidentified token '$_arg'", E_USER_ERROR, $object->_file, $object->_linenum);
+                    $gTpl->trigger_error("[SYNTAX] unidentified token '$_arg'", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
                 }
                 break;
         }

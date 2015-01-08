@@ -1,55 +1,36 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Plugins
+ *
+ * @package    gTemplate
+ * @subpackage Plugins
  */
 
-function tpl_modifier_date_format($string, $format="%b %e, %Y", $default_date=null)
-{
-    if($string != '')
-    {
-        return strftime($format, tpl_make_timestamp($string));
-    }
-    elseif (isset($default_date) && $default_date != '')
-    {
-        return strftime($format, tpl_make_timestamp($default_date));
-    }
-    else
-    {
+/**
+ * gTemplate date_format modifier plugin
+ *
+ * Type:     modifier<br>
+ * Name:     date_format<br>
+ * Purpose:  format datestamps via strftime<br>
+ * Input:<br>
+ *         - string: input date string
+ *         - format: strftime format for output
+ *         - default_date: default date if $string is empty
+ * 
+ * @version 1.0
+ * @author Tamas David (G-Lex) <glex at mittudomain.info>
+ * @link https://github.com/glex86/g-template-php G-Template Engine on Github
+ *
+ * @internal Some source codes are taken from Smarty
+ * @internal author Monte Ohrt <monte at ohrt dot com>
+ * @internal link http://smarty.net Smarty
+ */
+function tpl_modifier_date_format($string, $format = "%b %e, %Y", $default_date = '') {
+    require_once 'shared.make_timestamp.php';
+    
+    if ($string || $default_date) {
+        return strftime($format, tpl_make_timestamp($string? : $default_date));
+    } else {
         return;
-    }
-}
-
-if(!function_exists('tpl_make_timestamp'))
-{
-    function tpl_make_timestamp($string)
-    {
-        if(empty($string))
-        {
-            $string = "now";
-        }
-        $time = strtotime($string);
-        if (is_numeric($time) && $time != -1)
-        {
-            return $time;
-        }
-
-        // is mysql timestamp format of YYYYMMDDHHMMSS?
-        if (is_numeric($string) && strlen($string) == 14)
-        {
-            $time = mktime(substr($string,8,2),substr($string,10,2),substr($string,12,2),substr($string,4,2),substr($string,6,2),substr($string,0,4));
-            return $time;
-        }
-
-        // couldn't recognize it, try to return a time
-        $time = (int) $string;
-        if ($time > 0)
-        {
-            return $time;
-        }
-        else
-        {
-            return time();
-        }
     }
 }

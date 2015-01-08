@@ -1,96 +1,79 @@
 <?php
-/*
- * template_lite plugin
- * -------------------------------------------------------------
- * Type:     function
- * Name:     counter
- * Purpose:  print out a counter value
- * Credit:   Taken from the original Smarty
- *           http://smarty.php.net
- * -------------------------------------------------------------
+/**
+ * gTemplate Plugins
+ *
+ * @package    gTemplate
+ * @subpackage Plugins
  */
-function tpl_function_counter($params, &$tpl)
+
+/**
+ * gTemplate {counter} function plugin
+ * 
+ * Type:     function<br>
+ * Name:     counter<br>
+ * Purpose:  print out a counter value<br>
+ * 
+ * @version 1.0
+ * @author Tamas David (G-Lex) <glex at mittudomain.info>
+ * @link https://github.com/glex86/g-template-php G-Template Engine on Github
+ *
+ * @internal Some source codes are taken from Smarty
+ * @internal author Monte Ohrt <monte at ohrt dot com>
+ * @internal link http://smarty.net Smarty
+ */
+function tpl_function_counter($params, &$gTpl)
 {
-	static $count = array();
-	static $skipval = array();
-	static $dir = array();
-	static $name = "default";
-	static $printval = array();
-	static $assign = "";
+    static $counters = array();
 
-	extract($params);
+    $name = (isset($params['name'])) ? $params['name'] : 'default';
+    if (!isset($counters[$name])) {
+        $counters[$name] = array(
+            'start'=>1,
+            'skip'=>1,
+            'direction'=>'up',
+            'count'=>1
+            );
+    }
+    $counter =& $counters[$name];
 
-	if (!isset($name))
-	{
-		if(isset($id))
-		{
-			$name = $id;
-		}
-		else
-		{
-			$name = "default";
-		}
-	}
+    if (isset($params['start'])) {
+        $counter['start'] = $counter['count'] = (int)$params['start'];
+    }
 
-	if (isset($start))
-	{
-		$count[$name] = $start;
-	}
-	elseif (!isset($count[$name]))
-	{
-		$count[$name]=1;
-	}
+    if (!empty($params['assign'])) {
+        $counter['assign'] = $params['assign'];
+    }
 
-	if (!isset($print))
-	{
-		$printval[$name]=true;
-	}
-	else
-	{
-		$printval[$name]=$print;
-	}
+    if (isset($counter['assign'])) {
+        $gTpl->assign($counter['assign'], $counter['count']);
+    }
+    
+    if (isset($params['print'])) {
+        $print = (bool)$params['print'];
+    } else {
+        $print = empty($counter['assign']);
+    }
 
-	if (!empty($assign))
-	{
-		$printval[$name] = false;
-		$tpl->assign($assign, $count[$name]);
-	}
+    if ($print) {
+        $retval = $counter['count'];
+    } else {
+        $retval = null;
+    }
 
-	if ($printval[$name])
-	{
-		$retval = $count[$name];
-	}
-	else
-	{
-		$retval = null;
-	}
+    if (isset($params['skip'])) {
+        $counter['skip'] = $params['skip'];
+    }
+    
+    if (isset($params['direction'])) {
+        $counter['direction'] = $params['direction'];
+    }
 
-	if (isset($skip))
-	{
-		$skipval[$name] = $skip;
-	}
-	elseif (empty($skipval[$name]))
-	{
-		$skipval[$name] = 1;
-	}
-
-	if (isset($direction))
-	{
-		$dir[$name] = $direction;
-	}
-	elseif (!isset($dir[$name]))
-	{
-		$dir[$name] = "up";
-	}
-
-	if ($dir[$name] == "down")
-	{
-		$count[$name] -= $skipval[$name];
-	}
-	else
-	{
-		$count[$name] += $skipval[$name];
-	}
-
-	return $retval;
+    if ($counter['direction'] == "down")
+        $counter['count'] -= $counter['skip'];
+    else
+        $counter['count'] += $counter['skip'];
+    
+    return $retval;
+    
 }
+

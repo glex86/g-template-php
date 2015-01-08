@@ -7,12 +7,12 @@
  * @subpackage internalFunctions
  */
 
-function compile_include($arguments, &$object) {
-    $_args = $object->_parse_arguments($arguments);
+function compile_include($arguments, &$gTpl) {
+    $_args = $gTpl->_parse_arguments($arguments);
 
     $arg_list = array();
     if (empty($_args['file'])) {
-        $object->trigger_error("[SYNTAX] missing 'file' attribute in 'include' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+        $gTpl->trigger_error("[SYNTAX] missing 'file' attribute in 'include' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
     }
 
     foreach ($_args as $arg_name => $arg_value) {

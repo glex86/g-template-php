@@ -7,40 +7,40 @@
  * @subpackage internalFunctions
  */
 
-function compile_foreach_start($arguments, &$object) {
+function compile_foreach_start($arguments, &$gTpl) {
 
     //Emulate Smarty3 functionality: foreach $items as $item
-    $regexp1 = '/((?:('.$object->_obj_call_regexp.'|' . $object->_var_regexp . '|' . $object->_svar_regexp . ')(' . $object->_mod_regexp . '*))(?:\s+(.*))?) as \$('.$object->_dvar_guts_regexp.')=>\$('.$object->_dvar_guts_regexp.')/is';
-    $regexp2 = '/((?:('.$object->_obj_call_regexp.'|' . $object->_var_regexp . '|' . $object->_svar_regexp . ')(' . $object->_mod_regexp . '*))(?:\s+(.*))?) as \$('.$object->_dvar_guts_regexp.')/is';
+    $regexp1 = '/((?:('.$gTpl->_obj_call_regexp.'|' . $gTpl->_var_regexp . '|' . $gTpl->_svar_regexp . ')(' . $gTpl->_mod_regexp . '*))(?:\s+(.*))?) as \$('.$gTpl->_dvar_guts_regexp.')=>\$('.$gTpl->_dvar_guts_regexp.')/is';
+    $regexp2 = '/((?:('.$gTpl->_obj_call_regexp.'|' . $gTpl->_var_regexp . '|' . $gTpl->_svar_regexp . ')(' . $gTpl->_mod_regexp . '*))(?:\s+(.*))?) as \$('.$gTpl->_dvar_guts_regexp.')/is';
     if (preg_match($regexp1, $arguments)) {
         $arguments = preg_replace($regexp1, 'from=$1 key=$5 item=$6', $arguments);
     } else {
         $arguments = preg_replace($regexp2, 'from=$1 item=$5', $arguments);
     }
-        
-    $attrs = $object->_parse_arguments($arguments);
+
+    $attrs = $gTpl->_parse_arguments($arguments);
     $arg_list = array();
 
     /* Required attr: from */
     if (empty($attrs['from'])) {
-        return $object->trigger_error("[SYNTAX] missing 'from' attribute in 'foreach' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+        return $gTpl->trigger_error("[SYNTAX] missing 'from' attribute in 'foreach' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
     }
     $from = $attrs['from'];
 
     /* Required attr: item */
     if (empty($attrs['item'])) {
-        return $object->trigger_error("[SYNTAX]  missing 'item' attribute in 'foreach' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+        return $gTpl->trigger_error("[SYNTAX]  missing 'item' attribute in 'foreach' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
     }
-    $item = $object->_dequote($attrs['item']);
+    $item = $gTpl->_dequote($attrs['item']);
     if (!preg_match('~^\w+$~', $item)) {
-        return $object->trigger_error("[SYNTAX] 'item' must be a variable name (literal string) in 'foreach' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+        return $gTpl->trigger_error("[SYNTAX] 'item' must be a variable name (literal string) in 'foreach' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
     }
 
     /* attr: key */
     if (isset($attrs['key'])) {
-        $key  = $object->_dequote($attrs['key']);
+        $key  = $gTpl->_dequote($attrs['key']);
         if (!preg_match('~^\w+$~', $key)) {
-            return $object->trigger_error("[SYNTAX] 'key' must to be a variable name (literal string) in 'foreach' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+            return $gTpl->trigger_error("[SYNTAX] 'key' must to be a variable name (literal string) in 'foreach' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
         }
         $key_part = "\$gTpl->_vars['$key'] => ";
     } else {
@@ -74,6 +74,6 @@ function compile_foreach_start($arguments, &$object) {
                     ."    /* START of LOOP section */\n";
     }
     $output .= '?>';
-    $object->openTag('foreach', array('from' => $attrs['from']));
+    $gTpl->openTag('foreach', array('from' => $attrs['from']));
     return $output;
 }

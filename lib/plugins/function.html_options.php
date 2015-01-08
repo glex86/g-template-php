@@ -1,13 +1,13 @@
 <?php
-
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
- * -------------------------------------------------------------
+ * gTemplate Plugins
+ *
+ * @package    gTemplate
+ * @subpackage Plugins
  */
 
 /**
- * Smarty {html_options} function plugin
+ * gTemplate {html_options} function plugin
  * Type:     function<br>
  * Name:     html_options<br>
  * Purpose:  Prints the list of <option> tags generated from
@@ -23,15 +23,14 @@
  * - class      (optional) - string default not set
  * </pre>
  *
- * @link     http://www.smarty.net/manual/en/language.function.html.options.php {html_image}
- *           (Smarty online manual)
- * @author   Monte Ohrt <monte at ohrt dot com>
- * @author   Ralf Strehle (minor optimization) <ralf dot strehle at yahoo dot de>
+ * @version 1.0
+ * @author Tamas David (G-Lex) <glex at mittudomain.info>
+ * @link https://github.com/glex86/g-template-php G-Template Engine on Github
  *
- * @param array $params parameters
- *
- * @return string
- * @uses     tpl_escape_chars()
+ * @internal Some source codes are taken from Smarty
+ * @internal author   Monte Ohrt <monte at ohrt dot com>
+ * @internal author   Ralf Strehle (minor optimization) <ralf dot strehle at yahoo dot de>
+ * @internal link http://smarty.net Smarty
  */
 function tpl_function_html_options($params, &$gTpl) {
     require_once('shared.escape_chars.php');

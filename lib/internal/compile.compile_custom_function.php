@@ -7,9 +7,9 @@
  * @subpackage internalFunctions
  */
 
-function compile_compile_custom_function($function, $modifiers, $arguments, &$_result, &$object) {
-    if ($function = $object->_plugin_exists($function, "function")) {
-        $_args = $object->_parse_arguments($arguments);
+function compile_compile_custom_function($function, $modifiers, $arguments, &$_result, &$gTpl) {
+    if ($function = $gTpl->_plugin_exists($function, "function")) {
+        $_args = $gTpl->_parse_arguments($arguments);
         foreach ($_args as $key => $value) {
             if (is_bool($value)) {
                 $value = $value ? 'true' : 'false';
@@ -21,7 +21,7 @@ function compile_compile_custom_function($function, $modifiers, $arguments, &$_r
         }
         $_result = '<?php echo ';
         if (!empty($modifiers)) {
-            $_result .= $object->_parse_modifier($function . '(array(' . implode(',', (array) $_args) . '), $gTpl)', $modifiers) . '; ';
+            $_result .= $gTpl->_parse_modifier($function . '(array(' . implode(',', (array) $_args) . '), $gTpl)', $modifiers) . '; ';
         } else {
             $_result .= $function . '(array(' . implode(',', (array) $_args) . '), $gTpl);';
         }

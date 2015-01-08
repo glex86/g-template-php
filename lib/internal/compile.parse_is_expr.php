@@ -8,7 +8,7 @@
  */
 
 
-function compile_parse_is_expr($is_arg, $_args, &$object)
+function compile_parse_is_expr($is_arg, $_args, &$gTpl)
 {
     $expr_end = 0;
     $negate_expr = false;
@@ -28,7 +28,7 @@ function compile_parse_is_expr($is_arg, $_args, &$object)
             {
                 $expr_end++;
                 $expr_arg = $_args[$expr_end++];
-                $expr = "!(1 & ($is_arg / " . $object->_parse_variable($expr_arg) . "))";
+                $expr = "!(1 & ($is_arg / " . $gTpl->_parse_variable($expr_arg) . "))";
             }
             else
             {
@@ -41,7 +41,7 @@ function compile_parse_is_expr($is_arg, $_args, &$object)
             {
                 $expr_end++;
                 $expr_arg = $_args[$expr_end++];
-                $expr = "(1 & ($is_arg / " . $object->_parse_variable($expr_arg) . "))";
+                $expr = "(1 & ($is_arg / " . $gTpl->_parse_variable($expr_arg) . "))";
                 }
                 else
                 {
@@ -54,16 +54,16 @@ function compile_parse_is_expr($is_arg, $_args, &$object)
                 {
                     $expr_end++;
                     $expr_arg = $_args[$expr_end++];
-                    $expr = "!($is_arg % " . $object->_parse_variable($expr_arg) . ")";
+                    $expr = "!($is_arg % " . $gTpl->_parse_variable($expr_arg) . ")";
                 }
                 else
                 {
-                    $object->trigger_error("[SYNTAX] expecting 'by' after 'div'", E_USER_ERROR, $object->_file, $object->_linenum);
+                    $gTpl->trigger_error("[SYNTAX] expecting 'by' after 'div'", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
                 }
             break;
 
             default:
-                $object->trigger_error("[SYNTAX] unknown 'is' expression - '$expr_type'", E_USER_ERROR, $object->_file, $object->_linenum);
+                $gTpl->trigger_error("[SYNTAX] unknown 'is' expression - '$expr_type'", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
                 break;
         }
 

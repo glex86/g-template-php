@@ -1,14 +1,27 @@
 <?php
 /**
- * template_lite {strip}{/strip} block plugin
+ * gTemplate Plugins
  *
- * Type:     block function
- * Name:     strip
- * Purpose:  strip unwanted white space from text
- * Credit:   Taken from the original Smarty
- *           http://smarty.php.net
+ * @package    gTemplate
+ * @subpackage Plugins
  */
-function tpl_block_strip($params, $content, &$tpl)
+
+/**
+ * gTemplate {strip}{/strip} block plugin
+ *
+ * Type:     block function<br>
+ * Name:     strip<br>
+ * Purpose:  strip unwanted white space from text<br>
+ * 
+ * @version 1.0
+ * @author Tamas David (G-Lex) <glex at mittudomain.info>
+ * @link https://github.com/glex86/g-template-php G-Template Engine on Github
+ *
+ * @internal Some source codes are taken from Smarty
+ * @internal author Monte Ohrt <monte at ohrt dot com>
+ * @internal link http://smarty.net Smarty
+ */
+function tpl_block_strip($params, $content, &$gTpl)
 {
 	$_strip_search = array(
 		"![\t ]+$|^[\t ]+!m",		// remove leading/trailing space chars

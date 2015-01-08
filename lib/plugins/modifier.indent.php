@@ -1,23 +1,25 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Plugins
+ *
+ * @package    gTemplate
+ * @subpackage Plugins
  */
 
-
 /**
- * Smarty indent modifier plugin
+ * gTemplate indent modifier plugin
  *
  * Type:     modifier<br>
  * Name:     indent<br>
  * Purpose:  indent lines of text
- * @link http://smarty.php.net/manual/en/language.modifier.indent.php
- *          indent (Smarty online manual)
- * @author   Monte Ohrt <monte at ohrt dot com>
- * @param string
- * @param integer
- * @param string
- * @return string
+ * 
+ * @version 1.0
+ * @author Tamas David (G-Lex) <glex at mittudomain.info>
+ * @link https://github.com/glex86/g-template-php G-Template Engine on Github
+ *
+ * @internal Some source codes are taken from Smarty
+ * @internal author Monte Ohrt <monte at ohrt dot com>
+ * @internal link http://smarty.net Smarty
  */
 function tpl_modifier_indent($string,$chars=4,$char=" ")
 {

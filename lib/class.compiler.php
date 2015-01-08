@@ -17,43 +17,24 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @link https://github.com/glex86/g-template-php
+ * @version 1.0
  * @author Tamas David (G-Lex) <glex at mittudomain.info>
- * @author Monte Ohrt <monte at ohrt.com>
- * @author Andrei Zmievski <andrei at php.net>
- * @author Paul Lockaby <paul at paullockaby.com>
- * @author Mark Dickenson <akapanamajack at sourceforge.net>
+ * @link https://github.com/glex86/g-template-php G-Template Engine on Github
  *
- * @version 0.9
+ * @internal Some source codes are taken from Smarty
+ * @internal author Monte Ohrt <monte at ohrt dot com>
+ * @internal link http://smarty.net Smarty
  */
 
 class gTemplateCompiler extends gTemplate {
 
     // public configuration variables
-    var $left_delimiter = "";
-    var $right_delimiter = "";
-    var $plugin_prefix = array();
-    var $plugins_dir = array();
-    var $compile_dir = "";
-    var $template_dir = "";
-    var $reserved_template_varname = "";
-    var $default_modifiers = array();
-    var $php_extract_vars = true; // Set this to false if you do not want the $this->_tpl variables to be extracted for use by PHP code inside the template.
-    // private internal variables
-    var $_vars = array(); // stores all internal assigned variables
-    var $_confs = array(); // stores all internal config variables
-    var $_plugins = array(); // stores all internal plugins
     var $_linenum = 1;  // the current line number in the file we are processing
     var $_currentTag = '';
     var $_file = "";  // the current file we are processing
     var $_literal = array(); // stores all literal blocks
-    var $_foreachelse_stack = array();
-    var $_for_stack = 0;
-    var $_switch_stack = array();
     var $_tag_stack = array();
     var $_require_stack = array(); // stores all files that are "required" inside of the template
-    var $_php_blocks = array(); // stores all of the php blocks
-    var $_error_level = null;
     var $_db_qstr_regexp = null;        // regexps are setup in the constructor
     var $_si_qstr_regexp = null;
     var $_qstr_regexp = null;

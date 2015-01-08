@@ -1,22 +1,25 @@
 <?php
-
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Plugins
+ *
+ * @package    gTemplate
+ * @subpackage Plugins
  */
 
 /**
- * Smarty count_characters modifier plugin
+ * gTemplate count_characters modifier plugin
  *
  * Type:     modifier<br>
  * Name:     count_characteres<br>
  * Purpose:  count the number of characters in a text
- * @link http://smarty.php.net/manual/en/language.modifier.count.characters.php
- *          count_characters (Smarty online manual)
- * @author   Monte Ohrt <monte at ohrt dot com>
- * @param string
- * @param boolean include whitespace in the character count
- * @return integer
+ * 
+ * @version 1.0
+ * @author Tamas David (G-Lex) <glex at mittudomain.info>
+ * @link https://github.com/glex86/g-template-php G-Template Engine on Github
+ *
+ * @internal Some source codes are taken from Smarty
+ * @internal author Monte Ohrt <monte at ohrt dot com>
+ * @internal link http://smarty.net Smarty
  */
 function tpl_modifier_count_characters($string, $include_spaces = false) {
     if ($include_spaces) {

@@ -8,7 +8,7 @@
  */
 
 
-function template_destroy_dir($file, $id, $dir, &$object) {
+function template_destroy_dir($file, $id, $dir, &$gTpl) {
     if ($file == null && $id == null && is_dir($dir)) {
         if ($d = opendir($dir)) {
             while (($f = readdir($d)) !== false) {
@@ -19,7 +19,7 @@ function template_destroy_dir($file, $id, $dir, &$object) {
         }
     } else {
         if ($id == null) {
-            $name = $object->getCompiledName($file);
+            $name = $gTpl->getCompiledName($file);
             @unlink($dir . $name);
         } else {
             $_args = "";
@@ -39,11 +39,10 @@ function template_rm_dir($dir) {
     if ($d = opendir($dir)) {
         while (($f = readdir($d)) !== false) {
             if ($f != '.' && $f != '..') {
-                template_rm_dir($dir . $f . DIRECTORY_SEPARATOR, $object);
+                template_rm_dir($dir . $f . DIRECTORY_SEPARATOR, $gTpl);
             }
         }
         @rmdir($dir . $f);
     }
 }
 
-?>

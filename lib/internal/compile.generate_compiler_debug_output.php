@@ -7,8 +7,8 @@
  * @subpackage internalFunctions
  */
 
-function generate_compiler_debug_output(&$object)
-{
+function generate_compiler_debug_output(&$gTpl)
+{    
     $debug_output = "\$assigned_vars = \$gTpl->_vars;\n";
     $debug_output .= "ksort(\$assigned_vars);\n";
     $debug_output .= "if (@is_array(\$gTpl->_confs)) {\n";
@@ -24,8 +24,8 @@ function generate_compiler_debug_output(&$object)
     $debug_output .= "\$gTpl->assign('_debug_vals', array_values(\$assigned_vars));\n";
     $debug_output .= "\$gTpl->assign('_debug_tpls', \$included_templates);\n";
 
-    $debug_output .= "\$gTpl->left_delimiter = '{';\n";
-    $debug_output .= "\$gTpl->right_delimiter = '}';\n";
+    $debug_output .= "\$gTpl->left_delimiter = '<{';\n";
+    $debug_output .= "\$gTpl->right_delimiter = '}>';\n";
     $debug_output .= "\$gTpl->_debug_loop = true;\n";
     $debug_output .= "\$gTpl->_debug_dir = \$gTpl->template_dir;\n";
     $debug_output .= "\$gTpl->setTemplateDir(G_TEMPLATE_BASE . 'internal/');\n";

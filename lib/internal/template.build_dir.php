@@ -9,12 +9,12 @@
 
 
 
-function template_build_dir($dir, $id, &$object) {
+function template_build_dir($dir, $id, &$gTpl) {
     $_args = explode('|', $id);
     if (count($_args) == 1 && empty($_args[0])) {
-        return $object->_get_dir($dir);
+        return $gTpl->_get_dir($dir);
     }
-    $_result = $object->_get_dir($dir);
+    $_result = $gTpl->_get_dir($dir);
     foreach ($_args as $value) {
         $_result .= $value . DIRECTORY_SEPARATOR;
         if (!is_dir($_result)) {

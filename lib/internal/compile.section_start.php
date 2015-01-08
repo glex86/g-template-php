@@ -8,7 +8,7 @@
  */
 
 
-function compile_section_start($attrs, &$object) {        
+function compile_section_start($attrs, &$gTpl) {
         $arg_list = array();
 
         $output =   "<?php \n/* START of Section */\n";
@@ -16,12 +16,12 @@ function compile_section_start($attrs, &$object) {
         $section_name = $attrs['name'];
         /* Required attr: name */
         if (empty($section_name)) {
-            $object->trigger_error("[SYNTAX] missing 'name' attribute in 'section' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+            $gTpl->trigger_error("[SYNTAX] missing 'name' attribute in 'section' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
         }
 
         /* Required attr: loop */
         if (empty($attrs['loop'])) {
-            $object->trigger_error("[SYNTAX] missing 'loop' attribute in 'section' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+            $gTpl->trigger_error("[SYNTAX] missing 'loop' attribute in 'section' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
         }
 
         $output .= "\$gTpl->_sections[$section_name] = array();\n";
@@ -54,7 +54,7 @@ function compile_section_start($attrs, &$object) {
                     break;
 
                 default:
-                    $object->trigger_error("[SYNTAX] unknown attribute '$attr_name' in 'section' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+                    $gTpl->trigger_error("[SYNTAX] unknown attribute '$attr_name' in 'section' tag", E_USER_ERROR, $gTpl->_file, $gTpl->_linenum);
                     break;
             }
         }

@@ -17,14 +17,13 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @link https://github.com/glex86/g-template-php
+ * @version 1.0
  * @author Tamas David (G-Lex) <glex at mittudomain.info>
- * @author Monte Ohrt <monte at ohrt.com>
- * @author Andrei Zmievski <andrei at php.net>
- * @author Paul Lockaby <paul at paullockaby.com>
- * @author Mark Dickenson <akapanamajack at sourceforge.net>
+ * @link https://github.com/glex86/g-template-php G-Template Engine on Github
  *
- * @version 0.9
+ * @internal Some source codes are taken from Smarty
+ * @internal author Monte Ohrt <monte at ohrt dot com>
+ * @internal link http://smarty.net Smarty
  */
 
 class oTplConfig {
