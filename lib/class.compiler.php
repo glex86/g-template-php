@@ -881,29 +881,23 @@ class gTemplateCompiler extends gTemplate {
             preg_match_all('!:(' . $this->_qstr_regexp . '|[^:]+)!', $_args[$i], $_match);
             $_arg = $_match[1];
 
-            if ($_mods[$i]{0} == '@') {
-                $_mods[$i] = substr($_mods[$i], 1);
-                $_map_array = 0;
-            } else {
-                $_map_array = 1;
-            }
-
             foreach ($_arg as $key => $value) {
                 $_arg[$key] = $this->_parse_variable($value);
             }
 
-            if ($this->_plugin_exists($_mods[$i], "modifier") || function_exists($_mods[$i])) {
-                if (count($_arg) > 0) {
-                    $_arg = ', ' . implode(', ', $_arg);
-                } else {
-                    $_arg = '';
-                }
+            if (count($_arg) > 0) {
+                $_argString = ', ' . implode(', ', $_arg);
+            } else {
+                $_argString = '';
+            }            
+            
+            if ($pluginName = $this->_plugin_exists($_mods[$i], "inlinemodifier", true)) {
+                $variable = $pluginName($variable, $_arg, $this);
 
-                $php_function = "PHP";
-                if ($this->_plugin_exists($_mods[$i], "modifier")) {
-                    $php_function = "plugin";
-                }
-                $variable = "\$gTpl->_run_modifier($variable, '$_mods[$i]', '$php_function', $_map_array$_arg)";
+            } elseif ($this->_plugin_exists($_mods[$i], "modifier")) {
+                $variable = "{$this->plugin_prefix}_modifier_{$_mods[$i]}($variable$_argString)";
+            } elseif (function_exists($_mods[$i])) {
+                $variable = "{$_mods[$i]}($variable$_argString)";
             } else {
                 $this->trigger_error("[COMPILER] '" . $_mods[$i] . "' modifier does not exist", E_USER_NOTICE, $this->_file, $this->_linenum);
             }
@@ -911,23 +905,24 @@ class gTemplateCompiler extends gTemplate {
         return $variable;
     }
 
-    function _plugin_exists($function, $type) {
-        // check for object functions
-        if (isset($this->_plugins[$type][$function]) && is_array($this->_plugins[$type][$function]) && is_object($this->_plugins[$type][$function][0]) && method_exists($this->_plugins[$type][$function][0], $this->_plugins[$type][$function][1])) {
-            return '$gTpl->_plugins[\'' . $type . '\'][\'' . $function . '\'][0]->' . $this->_plugins[$type][$function][1];
+    function _plugin_exists($function, $type, $inline = false) {
+        // check for standard functions
+        if (isset($this->_plugins[$type][$function]) && function_exists($this->_plugins[$type][$function])) {
+            return $this->_plugins[$type][$function];
         }
+
         // check for a plugin in the plugin directory
         $plugin_filepath = $this->_get_plugin_filepath($type, $function);
         if (file_exists($plugin_filepath)) {
             require_once($plugin_filepath);
             if (function_exists($this->plugin_prefix . '_' . $type . '_' . $function)) {
-                $this->_require_stack[$type . '.' . $function . '.php'] = array($type, $function, $this->plugin_prefix . '_' . $type . '_' . $function);
+                if (!$inline) {
+                    $this->_require_stack[$type . '.' . $function . '.php'] = array($type, $function, $this->plugin_prefix . '_' . $type . '_' . $function);
+                }
+                
+                $this->_plugins[$type][$function] = $this->plugin_prefix . '_' . $type . '_' . $function;
                 return ($this->plugin_prefix . '_' . $type . '_' . $function);
             }
-        }
-        // check for standard functions
-        if (isset($this->_plugins[$type][$function]) && function_exists($this->_plugins[$type][$function])) {
-            return $this->_plugins[$type][$function];
         }
         return false;
     }

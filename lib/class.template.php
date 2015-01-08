@@ -70,6 +70,7 @@ class gTemplate {
     var $_foreach                       = array();
     var $_plugins                       = array(
                                                 'modifier'      => array(),
+                                                'inlinemodifier'=> array(),
                                                 'function'      => array(),
                                                 'block'         => array(),
                                                 'compiler'      => array(),
@@ -184,6 +185,14 @@ class gTemplate {
 
     function unregisterModifier($modifier) {
         unset($this->_plugins['modifier'][$modifier]);
+    }
+
+    function registerInlineModifier($modifier, $implementation) {
+        $this->_plugins['inlinemodifier'][$modifier] = $implementation;
+    }
+
+    function unregisterInlineModifier($modifier) {
+        unset($this->_plugins['inlinemodifier'][$modifier]);
     }
 
     function registerFunction($function, $implementation) {
@@ -441,18 +450,6 @@ class gTemplate {
 
         $this->_file = $prev_file_name;
         return $output;
-    }
-
-    function _run_modifier() {
-        $arguments = func_get_args();
-
-        list($variable, $modifier, $php_function, $_map_array) = array_splice($arguments, 0, 4);
-        array_unshift($arguments, $variable);
-
-        $modifier = $php_function == 'PHP' ? $modifier : $this->_plugins['modifier'][$modifier];
-
-                $variable = call_user_func_array($modifier, $arguments);
-        return $variable;
     }
 
 
