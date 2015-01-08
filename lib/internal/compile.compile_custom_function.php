@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Compiles the custom functions
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 function compile_compile_custom_function($function, $modifiers, $arguments, &$_result, &$object) {

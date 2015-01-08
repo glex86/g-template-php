@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Compiles the 'foreach' function
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 function compile_foreach_start($arguments, &$object) {

@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Include a subtemplate
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 function template_fetch_compile_include($include_file, $include_vars, &$object) {

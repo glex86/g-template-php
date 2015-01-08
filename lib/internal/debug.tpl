@@ -40,9 +40,9 @@
        var title = 'Console_' + self.name;
     {rdelim}
     _gTemplate_console = window.open("",title.value,"width=680,height=600,resizable,scrollbars=yes");
-    _gTemplate_console.document.write("<HTML><TITLE>Template Lite Debug Console_"+self.name+"</TITLE><BODY bgcolor=#ffffff>");
+    _gTemplate_console.document.write("<HTML><TITLE>gTemplate Debug Console_"+self.name+"</TITLE><BODY bgcolor=#ffffff>");
     _gTemplate_console.document.write("<table border=0 width=100%>");
-    _gTemplate_console.document.write("<tr bgcolor=#cccccc><th colspan=2>Template Lite Debug Console</th></tr>");
+    _gTemplate_console.document.write("<tr bgcolor=#cccccc><th colspan=2>gTemplate Debug Console</th></tr>");
     _gTemplate_console.document.write("<tr bgcolor=#cccccc><td colspan=2><b>Included templates & config files (load time in seconds):</b></td></tr>");
     {foreach key=key item=templates from=$_debug_tpls}
         _gTemplate_console.document.write("<tr bgcolor={if $key % 2}#eeeeee{else}#fafafa{/if}>");

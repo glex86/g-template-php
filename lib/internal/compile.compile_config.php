@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Compiles the config variables
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 function compile_compile_config($variable, &$object) {

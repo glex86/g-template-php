@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Load / Compile Config files
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 

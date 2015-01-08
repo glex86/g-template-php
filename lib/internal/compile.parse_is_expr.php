@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Parses 'is' expressions in 'if' tag
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 

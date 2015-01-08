@@ -1,8 +1,12 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Compiles the 'include' function
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
+
 function compile_include($arguments, &$object) {
     $_args = $object->_parse_arguments($arguments);
 

@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Compiles the 'if' function
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 function compile_compile_if($arguments, $elseif, $while, &$object) {

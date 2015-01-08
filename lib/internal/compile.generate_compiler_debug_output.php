@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * generate variables for the debug output
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 function generate_compiler_debug_output(&$object)

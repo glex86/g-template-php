@@ -1,7 +1,10 @@
 <?php
 /**
- * gTemplate Engine
- * https://github.com/glex86/g-template-php
+ * gTemplate Internal Function
+ * Remove subdirectories for caching functions
+ *
+ * @package    gTemplate
+ * @subpackage internalFunctions
  */
 
 
