@@ -380,11 +380,12 @@ class gTemplateCompiler extends gTemplate {
                 break;
 
             case 'section':
-                $this->openTag('section');
                 if (!function_exists('compile_section_start')) {
                     require_once(G_TEMPLATE_BASE . "internal/compile.section_start.php");
                 }
-                return compile_section_start($arguments, $this);
+                $attrs = $this->_parse_arguments($arguments);
+                $this->openTag('section', $attrs);
+                return compile_section_start($attrs, $this);
                 break;
 
             case 'sectionelse':
@@ -827,11 +828,22 @@ class gTemplateCompiler extends gTemplate {
                 } elseif ($var{0} == '#') {
                     $_result .= "[" . $this->_compile_config($var) . "]";
                 } else {
-                  $_result .= "['$var']";
-//                    $parts = explode('.', $var);
-//                    $section = $parts[0];
-//                    $section_prop = isset($parts[1]) ? $parts[1] : 'index';
-//                    $_result .= "[\$gTpl->_sections['$section']['$section_prop']]";
+                    $inSection = false;
+                    foreach ($this->_tag_stack as $stack) {
+                        $parts = explode('.', $var);
+                        $section = $parts[0];
+                        $section_prop = isset($parts[1]) ? $parts[1] : 'index';
+                        if ($stack['tag'] == 'section' && $stack['params']['name'] == $section) {
+                            $inSection = true;
+                        }
+                    }
+                            
+
+                    if ($inSection) {
+                        $_result .= "[\$gTpl->_sections['$section']['$section_prop']]";
+                    } else {
+                        $_result .= "['$var']";
+                    }
                 }
             } else if ($var{0} == '.') {
                 if ($var{1} == '$') {
@@ -937,5 +949,5 @@ class gTemplateCompiler extends gTemplate {
         array_pop($this->_tag_stack);
         return $lastTag;
     }
-
+    
 }

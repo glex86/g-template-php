@@ -8,8 +8,7 @@
  */
 
 
-function compile_section_start($arguments, &$object) {
-        $attrs = $object->_parse_arguments($arguments);
+function compile_section_start($attrs, &$object) {        
         $arg_list = array();
 
         $output =   "<?php \n/* START of Section */\n";
