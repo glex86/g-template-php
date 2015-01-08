@@ -11,57 +11,17 @@
 function debug_beauty_errors($gTpl, $error_msg, $error_type, $file, $line) {
     ?>
     <style type="text/css">
-        .gTpl {
-            margin: 10px 20px 0 20px;
-        }
-
-        .gTpl h1, .gTpl h2, .gTpl h3, .gTpl h4 {
-            margin-bottom: 0;
-        }
-
-        .gTpl h1 {
-            color: #cc0000;
-            border-bottom: 2px solid #ee0000;
-        }
-
-        .gTpl p {
-            margin-top: 5px;
-            margin-bottom: 30px;
-        }
-
-        .errormsg {
-            font-size: 1.1em;
-        }
-
-        .filedef {
-            font-size: 0.9em;
-            color: #444;
-            font-style: italic;
-        }
-
-        .errorbox p {
-            margin-bottom: 0;
-        }
-
-        .errorbox h3 {
-            margin-top: 0;
-        }
-        .errorbox {
-            background-color: #ffefef;
-            padding: 15px;
-        }
-
-        .subtitle {
-            font-size: 0.5em;
-            font-style: italic;
-            color: #555;
-            padding-left: 20px;
-        }
-
-        .backtrace {
-            font-family: monospace;
-            background-color: #f8f8f8;
-        }
+        .gTpl { margin: 10px 20px 0 20px; }
+        .gTpl h1, .gTpl h2, .gTpl h3, .gTpl h4 { margin-bottom: 0; }
+        .gTpl h1 { color: #cc0000; border-bottom: 2px solid #ee0000; }
+        .gTpl p { margin-top: 5px; margin-bottom: 30px; }
+        .errormsg { font-size: 1.1em; }
+        .filedef { font-size: 0.9em;color: #444; font-style: italic; }
+        .errorbox p { margin-bottom: 0; }
+        .errorbox h3 { margin-top: 0; }
+        .errorbox { background-color: #ffefef; padding: 15px; }
+        .subtitle { font-size: 0.5em; font-style: italic; color: #555; padding-left: 20px; }
+        .backtrace { font-family: monospace; background-color: #f8f8f8; }
     </style>
 
     <?php
