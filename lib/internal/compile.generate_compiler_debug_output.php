@@ -11,8 +11,8 @@ function generate_compiler_debug_output(&$object)
 {
     $debug_output = "\$assigned_vars = \$gTpl->_vars;\n";
     $debug_output .= "ksort(\$assigned_vars);\n";
-    $debug_output .= "if (@is_array(\$gTpl->_config[0])) {\n";
-    $debug_output .= "    \$config_vars = \$gTpl->_config[0];\n";
+    $debug_output .= "if (@is_array(\$gTpl->_confs)) {\n";
+    $debug_output .= "    \$config_vars = \$gTpl->_confs;\n";
     $debug_output .= "    ksort(\$config_vars);\n";
     $debug_output .= "    \$gTpl->assign('_debug_config_keys', array_keys(\$config_vars));\n";
     $debug_output .= "    \$gTpl->assign('_debug_config_vals', array_values(\$config_vars));\n";

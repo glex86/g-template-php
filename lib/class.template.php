@@ -47,7 +47,7 @@ class gTemplate {
     var $cache_lifetime                 = 0;                    // how long the file in cache should be considered "fresh"
     var $reserved_template_varname      = 'smarty';
     var $default_modifiers              = array();
-    var $debugging                      = false;
+    var $debug                          = false;
     var $beauty_errprs                  = true;
     var $cache                          = false;                // whether or not to allow caching of files
     var $force_compile                  = false;                // force a compile regardless of saved state

@@ -10,7 +10,7 @@
 
 $name = $this->getCompiledName($file, 'conf');
 
-if ($this->debugging) {
+if ($this->debug) {
     $debug_start_time = array_sum(explode(' ', microtime()));
 }
 
@@ -55,7 +55,7 @@ if (!empty($var_name)) {
 
 $this->_confs = array_merge($this->_confs, $configContent);
 
-if ($this->debugging) {
+if ($this->debug) {
     $this->_debug_info[] = array(  'type'      => 'config',
                                                 'filename'  => $file.' ['.$section_name.'] '.$var_name,
                                                 'depth'     => 0,

@@ -8,7 +8,7 @@
  */
 
 function template_fetch_compile_include($include_file, $include_vars, &$object) {
-    if ($object->debugging) {
+    if ($object->debug) {
         $object->_debug_info[] = array('type' => 'template',
             'filename' => $include_file,
             'depth' => ++$object->_inclusion_depth,
@@ -28,7 +28,7 @@ function template_fetch_compile_include($include_file, $include_vars, &$object) 
 
     $object->_inclusion_depth--;
 
-    if ($object->debugging) {
+    if ($object->debug) {
         $object->_debug_info[$included_tpls_idx]['exec_time'] = array_sum(explode(' ', microtime())) - $object->_debug_info[$included_tpls_idx]['exec_time'];
     }
     return $_compiled_output;
