@@ -31,6 +31,29 @@
         <tr bgcolor=#eeeeee><td colspan=2><tt><i>No config vars assigned</i></tt></td></tr>
     {/foreach}
     </table>
+{elseif $_debug_output == 'console'}
+    <SCRIPT language=javascript>
+    console.info('gTemplate Debug Console');
+    console.info('Included templates & config files (load time in seconds):');
+    {foreach key=key item=templates from=$_debug_tpls}
+        console.log('{section name=oo loop=$_debug_tpls[$key].depth}--{/section}{$_debug_tpls[$key].filename}', 
+        '{if isset($_debug_tpls[$key].exec_time)}{$_debug_tpls[$key].exec_time|string_format:"%.5f"} seconds{if $key eq 0} (total){/if}{/if}');
+    {foreachelse}
+        console.log('No template assigned');
+    {/foreach}
+        console.info('Assigned template variables:');        
+    {foreach key=key item=vars from=$_debug_keys}
+        console.log('{ldelim}${$_debug_keys[$key]}{rdelim}', {$_debug_vals[$key]|json_encode});
+    {foreachelse}
+        console.log('No template variables assigned');
+    {/foreach}
+        console.info('Assigned config file variables (outer template scope):');        
+    {foreach key=key item=config_vars from=$_debug_config_keys}
+        console.log('{ldelim}#{$_debug_config_keys[$key]}#{rdelim}', {$_debug_config_vals[$key]|json_encode});
+    {foreachelse}
+        console.log('No config vars assigned');
+    {/foreach}
+</SCRIPT>        
 {else}
 <SCRIPT language=javascript>
     if( self.name == '' ) {ldelim}

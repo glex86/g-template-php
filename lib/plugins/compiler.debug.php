@@ -1,7 +1,13 @@
 <?php
+/**
+ * gTemplate Plugins
+ *
+ * @package    gTemplate
+ * @subpackage Plugins
+ */
 
 /*
- * Template Lite plugin converted from Smarty
+ * Show debug window
  * -------------------------------------------------------------
  * Type:     function
  * Name:     debug
