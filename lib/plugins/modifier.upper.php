@@ -1,12 +1,9 @@
 <?php
 /**
- * template_lite upper modifier plugin
- *
- * Type:     modifier
- * Name:     upper
- * Purpose:  Wrapper for the PHP 'strtoupper' function
+ * gTemplate Engine
+ * https://github.com/glex86/g-template-php
  */
-function tpl_modifier_upper($string)
-{
-	return strtoupper($string);
+
+function tpl_modifier_upper($string) {    
+    return mb_strtoupper($string);
 }

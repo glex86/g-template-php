@@ -1,42 +1,32 @@
 <?php
 /**
- * Template Lite template_fetch_compile_include template internal module
- *
- * Type:	 template
- * Name:	 template_fetch_compile_include
+ * gTemplate Engine
+ * https://github.com/glex86/g-template-php
  */
 
-function template_fetch_compile_include($_templatelite_include_file, $_templatelite_include_vars, &$object)
-{
-	if ($object->debugging)
-	{
-		$object->_templatelite_debug_info[] = array('type'	  => 'template',
-											'filename'  => $_templatelite_include_file,
-											'depth'	 => ++$object->_inclusion_depth,
-											'exec_time' => array_sum(explode(' ', microtime())) );
-		$included_tpls_idx = count($object->_templatelite_debug_info) - 1;
-	}
+function template_fetch_compile_include($include_file, $include_vars, &$object) {
+    if ($object->debugging) {
+        $object->_debug_info[] = array('type' => 'template',
+            'filename' => $include_file,
+            'depth' => ++$object->_inclusion_depth,
+            'exec_time' => array_sum(explode(' ', microtime())));
+        $included_tpls_idx = count($object->_debug_info) - 1;
+    }
 
-	$object->_vars = array_merge($object->_vars, $_templatelite_include_vars);
-	$_templatelite_include_file = $object->_get_resource($_templatelite_include_file);
-	if(isset($object->_confs[0]))
-	{
-		array_unshift($object->_confs, $object->_confs[0]);
-		$_compiled_output = $object->_fetch_compile($_templatelite_include_file);
-		array_shift($object->_confs);
-	}
-	else
-	{
-		$_compiled_output = $object->_fetch_compile($_templatelite_include_file);
-	}
+    $object->_vars = array_merge($object->_vars, $include_vars);
+    $include_file = $object->_get_resource($include_file);
+    if (isset($object->_confs[0])) {
+        array_unshift($object->_confs, $object->_confs[0]);
+        $_compiled_output = $object->_fetch_compile($include_file);
+        array_shift($object->_confs);
+    } else {
+        $_compiled_output = $object->_fetch_compile($include_file);
+    }
 
-	$object->_inclusion_depth--;
+    $object->_inclusion_depth--;
 
-	if ($object->debugging)
-	{
-		$object->_templatelite_debug_info[$included_tpls_idx]['exec_time'] = array_sum(explode(' ', microtime())) - $object->_templatelite_debug_info[$included_tpls_idx]['exec_time'];
-	}
-	return $_compiled_output;
+    if ($object->debugging) {
+        $object->_debug_info[$included_tpls_idx]['exec_time'] = array_sum(explode(' ', microtime())) - $object->_debug_info[$included_tpls_idx]['exec_time'];
+    }
+    return $_compiled_output;
 }
-
-?>

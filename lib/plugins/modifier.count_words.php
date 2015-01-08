@@ -1,8 +1,7 @@
 <?php
 /**
- * Template Lite plugin converted from Smarty
- * @package Smarty
- * @subpackage plugins
+ * gTemplate Engine
+ * https://github.com/glex86/g-template-php
  */
 
 

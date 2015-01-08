@@ -1,8 +1,7 @@
 <?php
 /**
- * Smarty plugin
- * @package Smarty
- * @subpackage plugins
+ * gTemplate Engine
+ * https://github.com/glex86/g-template-php
  */
 
 

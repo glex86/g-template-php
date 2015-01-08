@@ -1,6 +1,11 @@
 <?php
 /**
- * template_lite capitalize modifier plugin
+ * gTemplate Engine
+ * https://github.com/glex86/g-template-php
+ */
+
+/**
+ * capitalize modifier plugin
  *
  * Type:     modifier
  * Name:     capitalize
@@ -8,5 +13,5 @@
  */
 function tpl_modifier_capitalize($string)
 {
-	return ucwords($string);
+    return ucwords($string);
 }

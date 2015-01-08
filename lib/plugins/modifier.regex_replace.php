@@ -1,8 +1,7 @@
 <?php
 /**
- * Template Lite plugin converted from Smarty
- * @package Smarty
- * @subpackage plugins
+ * gTemplate Engine
+ * https://github.com/glex86/g-template-php
  */
 
 
@@ -23,7 +22,7 @@
 function tpl_modifier_regex_replace($string, $search, $replace)
 {
     if (preg_match('!([a-zA-Z\s]+)$!s', $search, $match) && (strpos($match[1], 'e') !== false))
-	{
+    {
         /* remove eval-modifier from $search */
         $search = substr($search, 0, -strlen($match[1])) . preg_replace('![e\s]+!', '', $match[1]);
     }

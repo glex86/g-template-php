@@ -1,27 +1,26 @@
 <?php
 /**
- * Template Lite section_start compile plugin converted from Smarty
- *
- * Type:	 compile
- * Name:	 section_start
+ * gTemplate Engine
+ * https://github.com/glex86/g-template-php
  */
+
 
 function compile_section_start($arguments, &$object) {
         $attrs = $object->_parse_arguments($arguments);
         $arg_list = array();
 
         $output =   "<?php \n/* START of Section */\n";
-                    
+
         $section_name = $attrs['name'];
         /* Required attr: name */
         if (empty($section_name)) {
-            $object->trigger_error("missing section name", E_USER_ERROR, __FILE__, __LINE__);
+            $object->trigger_error("[SYNTAX] missing 'name' attribute in 'section' tag", E_USER_ERROR, $object->_file, $object->_linenum);
         }
-        
+
         /* Required attr: loop */
         if (empty($attrs['loop'])) {
-            $object->trigger_error("missing section loop attr", E_USER_ERROR, __FILE__, __LINE__);
-        }        
+            $object->trigger_error("[SYNTAX] missing 'loop' attribute in 'section' tag", E_USER_ERROR, $object->_file, $object->_linenum);
+        }
 
         $output .= "\$gTpl->_sections[$section_name] = array();\n";
         $section_props = "\$gTpl->_sections['$section_name']";
@@ -30,7 +29,7 @@ function compile_section_start($arguments, &$object) {
         foreach ($attrs as $attr_name => $attr_value) {
             switch ($attr_name) {
                 case 'name': break;
-                
+
                 case 'loop':
                     $output .= "{$section_props}['loop'] = is_array(\$_loop=$attr_value) ? count(\$_loop) : max(0, (int)\$_loop); unset(\$_loop);\n";
                     break;
@@ -53,14 +52,14 @@ function compile_section_start($arguments, &$object) {
                     break;
 
                 default:
-                    $object->trigger_error("unknown section attribute - '$attr_name'", E_USER_ERROR, __FILE__, __LINE__);
+                    $object->trigger_error("[SYNTAX] unknown attribute '$attr_name' in 'section' tag", E_USER_ERROR, $object->_file, $object->_linenum);
                     break;
             }
         }
 
         $output .= '/* END of Setting predefined attributes */'."\n";
-        $output .= "\n".'/* Setting default values for attributes */'."\n";             
-        
+        $output .= "\n".'/* Setting default values for attributes */'."\n";
+
         if (!isset($attrs['show']))
             $output .= "{$section_props}['show'] = true;\n";
 
@@ -97,21 +96,21 @@ function compile_section_start($arguments, &$object) {
                    "} else\n" .
                    "    {$section_props}['total'] = 0;\n";
 
-	$output .= "/* END of Determine Total loops */\n";
-        $output .= '/* END of Setting default values for attributes */'."\n";                     
-                   
+    $output .= "/* END of Determine Total loops */\n";
+        $output .= '/* END of Setting default values for attributes */'."\n";
+
         $output .= "if ({$section_props}['show']):";
-        
-	$output .= "
-		for ({$section_props}['index'] = {$section_props}['start'], {$section_props}['iteration'] = 1;
-			 {$section_props}['iteration'] <= {$section_props}['total'];
-			 {$section_props}['index'] += {$section_props}['step'], {$section_props}['iteration']++):\n";
-                         
+
+    $output .= "
+        for ({$section_props}['index'] = {$section_props}['start'], {$section_props}['iteration'] = 1;
+             {$section_props}['iteration'] <= {$section_props}['total'];
+             {$section_props}['index'] += {$section_props}['step'], {$section_props}['iteration']++):\n";
+
         $output .= "?>";
 
         return $output;
-        
-        
+
+
         $output .= "
             for ({$section_props}['index'] = {$section_props}['start'], {$section_props}['iteration'] = 1;
                  {$section_props}['iteration'] <= {$section_props}['total'];
@@ -125,146 +124,6 @@ function compile_section_start($arguments, &$object) {
         $output .= "?>";
 
         return $output;
-        
-        
-        
-    
-    
-    $attrs = $object->_parse_arguments($arguments);
-    $arg_list = array();
 
-    $section_name = $object->_dequote($attrs['name']);
-    
-    //$section_hash = sha1(serialize($attrs));
-    
-    /* Required attr: name */
-    if (empty($section_name)) {
-        $object->trigger_error("missing section name", E_USER_ERROR, __FILE__, __LINE__);
-    }
 
-    /* Required attr: loop */
-    if (empty($attrs['loop'])) {
-        $object->trigger_error("missing section loop attr", E_USER_ERROR, __FILE__, __LINE__);
-    }
-    
-    /* Default output base */
-    $padded_name = str_pad(' '.$section_name.' ', 26, '*', STR_PAD_BOTH);
-    $output = "<?php \n  /******************************/\n"
-                     ." /* gTemplate Section function */\n"
-                    . "/**{$padded_name}**/\n";
-                    //. "function gTemplate_Section_{$section_hash}() {\n";
-                    
-    /* Empty section stack item */    
-    $output .= '$gTpl->_sections[\''.$section_name.'\'] = array();'."\n";
-    $section_props = '$gTpl->_sections[\''.$section_name.'\']';
-
-    $output .= '/* Setting predefined attributes */'."\n";
-    foreach ($attrs as $attr_name => $attr_value) {
-        switch ($attr_name) {
-            case 'name': break;
-            
-            case 'loop':
-                    $output .= "{$section_props}['loop'] = is_array($attr_value) ? count($attr_value) : max(0, (int)$attr_value);\n";
-                    break;
-
-            case 'show':
-                    if (is_bool($attr_value)) {
-                        $show_attr_value = $attr_value ? 'true' : 'false';
-                    } else {
-                        $show_attr_value = "(bool)$attr_value";
-                    }
-
-                    $output .= $section_props.'[\'show\'] = '.$show_attr_value.";\n";
-                    break;
-
-            case 'max':
-            case 'start':
-                    $output .= "{$section_props}['$attr_name'] = (int)$attr_value;\n";
-                    break;
-
-            case 'step':
-                    $output .= "{$section_props}['step'] = ((int)$attr_value) == 0 ? 1 : (int)$attr_value;\n";
-                    break;
-
-            default:
-                    $object->trigger_error("unknown section attribute - '$attr_name'", E_USER_ERROR, __FILE__, __LINE__);
-                    break;
-        }
-    }
-    
-    
-    
-        $output .= '/* END of Setting predefined attributes */'."\n";
-
-        $output .= "\n".'/* Setting default values for attributes */'."\n";        
-	if (!isset($attrs['show']))
-	{
-		$output .= "{$section_props}['show'] = true;\n";
-	}
-
-	if (!isset($attrs['loop']))
-	{
-		$output .= "{$section_props}['loop'] = 1;\n";
-	}
-
-	if (!isset($attrs['max']))
-	{
-		$output .= "{$section_props}['max'] = {$section_props}['loop'];\n";
-	}
-	else
-	{
-		$output .= "if ({$section_props}['max'] < 0)\n" .
-					"	{$section_props}['max'] = {$section_props}['loop'];\n";
-	}
-
-	if (!isset($attrs['step']))
-	{
-		$output .= "{$section_props}['step'] = 1;\n";
-	}
-
-	if (!isset($attrs['start']))
-	{
-		$output .= "{$section_props}['start'] = {$section_props}['step'] > 0 ? 0 : {$section_props}['loop']-1;\n";
-	}
-	else
-	{
-		$output .= "if ({$section_props}['start'] < 0)\n" .
-				   "	{$section_props}['start'] = max({$section_props}['step'] > 0 ? 0 : -1, {$section_props}['loop'] + {$section_props}['start']);\n" .
-				   "else\n" .
-				   "	{$section_props}['start'] = min({$section_props}['start'], {$section_props}['step'] > 0 ? {$section_props}['loop'] : {$section_props}['loop']-1);\n";
-	}
-
-	$output .= "/* Determine Total loops */\nif ({$section_props}['show']) {\n";
-	if (!isset($attrs['start']) && !isset($attrs['step']) && !isset($attrs['max']))
-	{
-		$output .= "	{$section_props}['total'] = {$section_props}['loop'];\n";
-	}
-	else
-	{
-		$output .= "	{$section_props}['total'] = min(ceil(({$section_props}['step'] > 0 ? {$section_props}['loop'] - {$section_props}['start'] : {$section_props}['start']+1)/abs({$section_props}['step'])), {$section_props}['max']);\n";
-	}
-	$output .= "	if ({$section_props}['total'] == 0) {\n" .
-			   "		{$section_props}['show'] = false;\n	}\n" .
-			   "} else {\n" .
-			   "	{$section_props}['total'] = 0;\n}\n";
-	$output .= "/* END of Determine Total loops */\n";
-        $output .= '/* END of Setting default values for attributes */'."\n";        
-
-        
-	$output .= "if ({$section_props}['show']):\n";
-	$output .= "
-		for ({$section_props}['index'] = {$section_props}['start'], {$section_props}['iteration'] = 1;
-			 {$section_props}['iteration'] <= {$section_props}['total'];
-			 {$section_props}['index'] += {$section_props}['step'], {$section_props}['iteration']++):\n";
-//	$output .= "{$section_props}['rownum'] = {$section_props}['iteration'];\n";
-//	$output .= "{$section_props}['index_prev'] = {$section_props}['index'] - {$section_props}['step'];\n";
-//	$output .= "{$section_props}['index_next'] = {$section_props}['index'] + {$section_props}['step'];\n";
-//	$output .= "{$section_props}['first']	  = ({$section_props}['iteration'] == 1);\n";
-//	$output .= "{$section_props}['last']	   = ({$section_props}['iteration'] == {$section_props}['total']);\n";
-
-	$output .= "?>";
-	
-
-	return $output;
 }
-?>

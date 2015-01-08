@@ -23,7 +23,7 @@
  * @author Andrei Zmievski <andrei at php.net>
  * @author Paul Lockaby <paul at paullockaby.com>
  * @author Mark Dickenson <akapanamajack at sourceforge.net>
- * 
+ *
  * @version 0.9
  */
 
@@ -44,6 +44,7 @@ class gTemplateCompiler extends gTemplate {
     var $_confs = array(); // stores all internal config variables
     var $_plugins = array(); // stores all internal plugins
     var $_linenum = 1;  // the current line number in the file we are processing
+    var $_currentTag = '';
     var $_file = "";  // the current file we are processing
     var $_literal = array(); // stores all literal blocks
     var $_foreachelse_stack = array();
@@ -73,7 +74,6 @@ class gTemplateCompiler extends gTemplate {
     var $_obj_start_regexp = null;
     var $_obj_params_regexp = null;
     var $_obj_call_regexp = null;
-    var $_templatelite_vars = array();
 
     function __construct() {
         // matches double quoted strings:
@@ -223,24 +223,22 @@ class gTemplateCompiler extends gTemplate {
         $_match = array();              // a temp variable for the current regex match
         $tags = array();                // all original tags
         $text = array();                // all original text
-        
+
         $compiled_banner = '<?php ' . "\n"
                 . '/* ' . self::NAME . ' ' . self::VERSION . ' - Compiled template' . "\n"
                 . ' * - Compiled on ' . strftime("%Y-%m-%d %H:%M:%S") . "\n"
                 . ' * - From source template: ' . $filename . "\n" . ' */ ' . "\n"
                 . 'function ' . $functionHashName . '( &$gTpl ) { ' . "\n" . '?>';
-        
+
         $compiled_text = '';       // stores the compiled result
         $compiled_tags = array();  // all tags and stuff
         $this->_linenum = 1;
 
         $this->_require_stack = array();
 
-        //$this->_load_filters();
-        
         // remove all comments
         $file_contents = preg_replace("!{$ldq}\*.*?\*{$rdq}!se","",$file_contents);
-         
+
         // replace all php start and end tags
         $file_contents = preg_replace('%(<\?(php|=|$)|\?>)%i', '<?php echo \'\\1\'?>', $file_contents);
 
@@ -248,7 +246,7 @@ class gTemplateCompiler extends gTemplate {
         preg_match_all("!{$ldq}\s*literal\s*{$rdq}(.*?){$ldq}\s*/literal\s*{$rdq}!s", $file_contents, $_match);
         $this->_literal = $_match[1];
         $file_contents = preg_replace("!{$ldq}\s*literal\s*{$rdq}(.*?){$ldq}\s*/literal\s*{$rdq}!s", stripslashes($ldq . "literal" . $rdq), $file_contents);
-                
+
         // gather all template tags
         preg_match_all("!{$ldq}\s*(.*?)\s*{$rdq}!s", $file_contents, $_match);
         $tags = $_match[1];
@@ -267,7 +265,7 @@ class gTemplateCompiler extends gTemplate {
         //Handle unclosed template tags
         if (count($this->_tag_stack)) {
             $unclosedStack = end($this->_tag_stack);
-            $this->trigger_error('Unclosed {' . $unclosedStack['tag'] . '} tag! Opened on line ' . $unclosedStack['line']);
+            $this->trigger_error('[SYNTAX] Unclosed '.$this->left_delimiter . $unclosedStack['tag'] .$this->right_delimiter. ' tag found! Opened in '.$this->_file.' on line ' . $unclosedStack['line'], E_USER_ERROR, $this->_file);
         }
 
         // build the compiled template by replacing and interleaving text blocks and compiled tags
@@ -285,11 +283,11 @@ class gTemplateCompiler extends gTemplate {
             $compiled_requirestack = "<?php \n/* START of Require Stack */\n?>";
 
             foreach ($this->_require_stack as $key => $value) {
-                $compiled_requirestack .= '<?php require_once(\'' . $this->_get_plugin_dir($key) . $key . '\');' . "\n" . '$gTpl->register_' . $value[0] . '(\'' . $value[1] . '\', \'' . $value[2] . '\');' . "\n" . '?>';
+                $compiled_requirestack .= '<?php require_once(\'' . $this->_get_plugin_dir($key) . $key . '\');' . "\n" . '$gTpl->register' . ucwords($value[0]) . '(\'' . $value[1] . '\', \'' . $value[2] . '\');' . "\n" . '?>';
             }
-            
+
             $compiled_requirestack .= '<?php /* END of Require Stack */' . "\n" . '?>';
-           
+
             $compiled_text = $compiled_requirestack.$compiled_text;
         }
 
@@ -308,16 +306,19 @@ class gTemplateCompiler extends gTemplate {
             return '';
         }
 
+
         $_match = array();  // stores the tags
         $_result = "";      // the compiled tag
         $_variable = "";    // the compiled variable
         // extract the tag command, modifier and arguments
-        preg_match_all('/(?:(' . $this->_var_regexp . '|' . $this->_svar_regexp . '|' . $this->_fvar_regexp . '|\/?' . $this->_func_regexp . ')(' . $this->_mod_regexp . '*)(?:\s*[,\.]\s*)?)(?:\s+(.*))?/xs', $tag, $_match);
+        $regexp = '/(?:(' . $this->_obj_call_regexp . '|' .  $this->_var_regexp . '|' . $this->_svar_regexp . '|' . $this->_fvar_regexp . '|\/?' . $this->_func_regexp . ')(' . $this->_mod_regexp . '*)(?:\s*[,\.]\s*)?)(?:\s+(.*))?/xs';
+
+        preg_match_all($regexp, $tag, $_match);
         if ($_match[1][0]{0} == '$' || ($_match[1][0]{0} == '#' && $_match[1][0]{strlen($_match[1][0]) - 1} == '#') || $_match[1][0]{0} == "'" || $_match[1][0]{0} == '"' || $_match[1][0]{0} == '%'
          || ($_match[1][0]{0} == '{' && $_match[1][0]{strlen($_match[1][0]) - 1} == '}')) {
             $_result = $this->_parse_variables($_match[1], $_match[2]);
             return "<?php echo $_result; ?>\n";
-        }  
+        }
 
         // process a function
         $tag_command = $_match[1][0];
@@ -328,6 +329,7 @@ class gTemplateCompiler extends gTemplate {
     }
 
     function _parse_function($function, $modifiers, $arguments) {
+        $this->_currentTag = $function;
         switch ($function) {
             case 'include':
                 if (!function_exists('compile_include')) {
@@ -335,15 +337,15 @@ class gTemplateCompiler extends gTemplate {
                 }
                 return compile_include($arguments, $this);
                 break;
-                
+
             case 'ldelim':
                 return $this->left_delimiter;
                 break;
-            
+
             case 'rdelim':
                 return $this->right_delimiter;
                 break;
-            
+
             case 'literal':
                 list (, $literal) = each($this->_literal);
                 $this->_linenum += substr_count($literal, "\n");
@@ -356,7 +358,7 @@ class gTemplateCompiler extends gTemplate {
                 }
                 return compile_foreach_start($arguments, $this);
                 break;
-                
+
             case 'foreachelse':
                 $closedTag = $this->closeTag($function, 'foreach');
                 $this->openTag('foreachelse');
@@ -364,7 +366,7 @@ class gTemplateCompiler extends gTemplate {
                             ."endforeach; else: ?>";
                 return $_result;
                 break;
-            
+
             case '/foreach':
                 $closedTag = $this->closeTag($function, array('foreach', 'foreachelse'));
                 if ($closedTag['tag'] == 'foreachelse') {
@@ -384,13 +386,13 @@ class gTemplateCompiler extends gTemplate {
                 }
                 return compile_section_start($arguments, $this);
                 break;
-                
+
             case 'sectionelse':
                 $this->closeTag($function, 'section');
                 $this->openTag('sectionelse');
                 return "<?php endfor; else: ?>";
                 break;
-            
+
             case '/section':
                 $closedTag = $this->closeTag($function, array('section', 'sectionelse'));
 
@@ -400,46 +402,46 @@ class gTemplateCompiler extends gTemplate {
                     return "<?php endfor; endif; ?>";
                 }
                 break;
-                
+
             case 'if':
                 $this->openTag('if');
                 return $this->_compile_if($arguments);
                 break;
-            
+
             case 'else':
                 $this->closeTag($function, array('if', 'elseif'));
                 $this->openTag('else');
                 return "<?php else: ?>";
                 break;
-            
+
             case 'elseif':
                 $this->closeTag($function, array('if', 'elseif'));
                 $this->openTag('elseif');
                 return $this->_compile_if($arguments, true);
                 break;
-            
+
             case '/if':
                 $this->closeTag($function, array('if', 'elseif', 'else'));
                 return "<?php endif; ?>";
                 break;
-            
+
             case 'assign':
                 $_args = $this->_parse_arguments($arguments);
                 if (!isset($_args['var'])) {
-                    $this->trigger_error("missing 'var' attribute in 'assign'", E_USER_ERROR, __FILE__, __LINE__);
+                    $this->trigger_error("[SYNTAX] missing 'var' attribute in 'assign'", E_USER_ERROR, $this->_file, $this->_linenum);
                 }
                 if (!isset($_args['value'])) {
-                    $this->trigger_error("missing 'value' attribute in 'assign'", E_USER_ERROR, __FILE__, __LINE__);
+                    $this->trigger_error("[SYNTAX] missing 'value' attribute in 'assign'", E_USER_ERROR, $this->_file, $this->_linenum);
                 }
                 if (is_bool($_args['value']))
                     $_args['value'] = $_args['value'] ? 'true' : 'false';
-                return '<?php $this->assign(\'' . $this->_dequote($_args['var']) . '\', ' . $_args['value'] . '); ?>';
+                return '<?php $gTpl->assign(\'' . $this->_dequote($_args['var']) . '\', ' . $_args['value'] . '); ?>';
                 break;
 
             case 'config_load':
                 $_args = $this->_parse_arguments($arguments);
                 if (empty($_args['file'])) {
-                    $this->trigger_error("missing 'file' attribute in 'config_load' tag", E_USER_ERROR, __FILE__, __LINE__);
+                    $this->trigger_error("[SYNTAX] missing 'file' attribute in 'config_load' tag", E_USER_ERROR, $this->_file, $this->_linenum);
                 }
                 isset($_args['section']) ? null : $_args['section'] = 'null';
                 isset($_args['var']) ? null : $_args['var'] = 'null';
@@ -458,7 +460,7 @@ class gTemplateCompiler extends gTemplate {
                 } elseif ($this->_compile_custom_function($function, $modifiers, $arguments, $_result)) {
                     return $_result;
                 } else {
-                    $this->trigger_error($function . " function does not exist", E_USER_ERROR, __FILE__, __LINE__);
+                    $this->trigger_error('[COMPILER] function \''.$function .'\' does not exist', E_USER_ERROR, $this->_file, $this->_linenum);
                 }
                 break;
         }
@@ -517,12 +519,32 @@ class gTemplateCompiler extends gTemplate {
         }
     }
 
-    function _parse_arguments($arguments) {
+    
+    function _parse_arguments_error($state, $attribute, $value='') {
+        switch ($state) {
+            case 0:
+                $this->trigger_error("[SYNTAX] invalid attribute name: '{$attribute}' in '{$this->_currentTag}' tag", E_USER_ERROR, $this->_file, $this->_linenum);
+                break;
+
+            case 1:
+                $this->trigger_error("[SYNTAX] expecting '=' after '{$attribute}' because '{$attribute}' is not a switch flag in '{$this->_currentTag}' tag", E_USER_ERROR, $this->_file, $this->_linenum);
+                break;
+
+            case 2:
+                $this->trigger_error("[SYNTAX] '{$value}' cannot be an attribute value in '{$this->_currentTag}' tag", E_USER_ERROR, $this->_file, $this->_linenum);
+                break;
+        }
+    }
+    
+    function _parse_arguments($arguments) {        
         $_match = array();
         $_result = array();
-        $_variables = array();
-        preg_match_all('/(?:' . $this->_qstr_regexp . ' | (?>[^"\'=\s]+))+|[=]/x', $arguments, $_match);
-
+        $_variables = array();       
+        preg_match_all('~(?:' . $this->_obj_call_regexp . '|' . $this->_qstr_regexp . ' | (?>[^"\'=\s]+)
+                         )+ |
+                         [=]
+                        ~x', $arguments, $_match);
+        
         /*
           Parse state:
           0 - expecting attribute name
@@ -530,22 +552,23 @@ class gTemplateCompiler extends gTemplate {
           2 - expecting attribute value (not '=')
          */
         $state = 0;
+        $attribute = '';
         foreach ($_match[0] as $value) {
             switch ($state) {
                 case 0:
                     // valid attribute name
                     if (is_string($value)) {
-                        $a_name = $value;
+                        $attribute = $value;
                         $state = 1;
                     } else {
-                        $this->trigger_error("invalid attribute name: '$token'", E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_parse_arguments_error($state, $value);                        
                     }
                     break;
                 case 1:
                     if ($value == '=') {
                         $state = 2;
                     } else {
-                        $this->trigger_error("expecting '=' after '$last_value'", E_USER_ERROR, __FILE__, __LINE__);
+                        $this->_parse_arguments_error($state, $attribute);                        
                     }
                     break;
                 case 2:
@@ -558,25 +581,21 @@ class gTemplateCompiler extends gTemplate {
                             $value = null;
                         }
 
-                        if (!preg_match_all('/(?:(' . $this->_var_regexp . '|' . $this->_svar_regexp . ')(' . $this->_mod_regexp . '*))(?:\s+(.*))?/xs', $value, $_variables)) {
-                            $_result[$a_name] = $value;
+                        if (!preg_match_all('/(?:('.$this->_obj_call_regexp.'|' . $this->_var_regexp . '|' . $this->_svar_regexp . ')(' . $this->_mod_regexp . '*))(?:\s+(.*))?/xs', $value, $_variables)) {
+                            $_result[$attribute] = $value;
                         } else {
-                            $_result[$a_name] = $this->_parse_variables($_variables[1], $_variables[2]);
+                            $_result[$attribute] = $this->_parse_variables($_variables[1], $_variables[2]);
                         }
                         $state = 0;
-                    } else {
-                        $this->trigger_error("'=' cannot be an attribute value", E_USER_ERROR, __FILE__, __LINE__);
+                    } else {                        
+                        $this->_parse_arguments_error($state, $attribute, $value);
                     }
                     break;
             }
             $last_value = $value;
         }
         if ($state != 0) {
-            if ($state == 1) {
-                $this->trigger_error("expecting '=' after attribute name '$last_value'", E_USER_ERROR, __FILE__, __LINE__);
-            } else {
-                $this->trigger_error("missing attribute value", E_USER_ERROR, __FILE__, __LINE__);
-            }
+            $this->_parse_arguments_error($state, $attribute, $value);
         }
         return $_result;
     }
@@ -585,7 +604,7 @@ class gTemplateCompiler extends gTemplate {
         $_result = "";
         foreach ($variables as $key => $value) {
             $tag_variable = trim($variables[$key]);
-            if (!empty($this->default_modifiers) && !preg_match('!(^|\|)templatelite:nodefaults($|\|)!', $modifiers[$key])) {
+            if (!empty($this->default_modifiers) && !preg_match('!(^|\|)gtpl:nodefaults($|\|)!', $modifiers[$key])) {
                 $_default_mod_string = implode('|', (array) $this->default_modifiers);
                 $modifiers[$key] = empty($modifiers[$key]) ? $_default_mod_string : $_default_mod_string . '|' . $modifiers[$key];
             }
@@ -612,8 +631,8 @@ class gTemplateCompiler extends gTemplate {
             //   just get everything from the $ to the ending space and parse it
             // if the $ is escaped, then we won't expand it
             $_result = "";
-            preg_match_all('/(?:' . $this->_dvar_regexp . ')/', substr($variable, 1, -1), $_expand);  // old match 
-//			preg_match_all('/(?:[^\\\]' . $this->_dvar_regexp . '[^\\\])/', $variable, $_expand);
+            preg_match_all('/(?:' . $this->_dvar_regexp . ')/', substr($variable, 1, -1), $_expand);  // old match
+//          preg_match_all('/(?:[^\\\]' . $this->_dvar_regexp . '[^\\\])/', $variable, $_expand);
 
             $_expand = array_unique($_expand[0]);
             foreach ($_expand as $key => $value) {
@@ -632,7 +651,7 @@ class gTemplateCompiler extends gTemplate {
         } elseif ($variable{0} == "'") {
             // return the value just as it is
             return $variable;
-        } elseif ($variable{0} == "%") {
+        } elseif ($variable{0} == "%") {            
             return $this->_parse_section_prop($variable);
         } elseif ($variable{0} == "{") {
             return $this->_parse_foreach_prop(substr($variable,1,-1));
@@ -643,8 +662,8 @@ class gTemplateCompiler extends gTemplate {
             return $variable;
         }
     }
-    
-    
+
+
     /*
      * SECTION PROPERTIES
      */
@@ -663,37 +682,37 @@ class gTemplateCompiler extends gTemplate {
 
         return $output;
     }
-    
+
     function _compile_section_prop($_var, $prop) {
         $compiled_ref = '';
-        
+
         switch ($prop) {
             case 'first':
                 $compiled_ref = "(\$gTpl->_sections['$_var']['iteration'] == 1)";
                 break;
-            
+
             case 'last':
                 $compiled_ref = "(\$gTpl->_sections['$_var']['iteration'] == \$gTpl->_sections['$_var']['total'])";
                 break;
-            
+
             default:
                 $compiled_ref = "(\$gTpl->_sections['$_var']['$prop'])";
                 break;
         }
-        
+
         return $compiled_ref;
     }
-    
-    
+
+
     /*
      * FOREACH PROPERTIES
      */
     function _parse_foreach_prop($prop) {
         $parts = explode('.', $prop);
-        
+
         return $this->_compile_foreach_prop($parts[0], $parts[1]);
     }
-    
+
     function _compile_foreach_prop($_var, $prop) {
         $compiled_ref = '';
         switch ($prop) {
@@ -716,7 +735,7 @@ class gTemplateCompiler extends gTemplate {
             default:
                 $compiled_ref = "\$gTpl->_foreach[$_var][$prop]";
         }
-        
+
         return $compiled_ref;
     }
 
@@ -786,17 +805,18 @@ class gTemplateCompiler extends gTemplate {
                     default:
 
                         $_var_name = str_replace($find, "", $variable[0]);
-                        $this->trigger_error(implode('', $variable) . ' is an invalid $'.$this->reserved_template_varname.' reference', E_USER_ERROR, __FILE__, __LINE__);
-                        $_result = "\$gTpl->_templatelite_vars['$_var_name']";
+                        $this->trigger_error('[COMPILER] $'.$this->reserved_template_varname.implode('', $variable) . ' is an invalid $'.$this->reserved_template_varname.' reference', E_USER_ERROR, $this->_file, $this->_linenum);
+                        $_result = "\$gTpl->_vars['$_var_name']";
                         break;
                 }
                 array_shift($variable);
             } else {
-                $this->trigger_error('$' . $var_name . implode('', $variable) . ' is an invalid $templatelite reference', E_USER_ERROR, __FILE__, __LINE__);
+                $this->trigger_error('[COMPILER] $' . $var_name . implode('', $variable) . ' is an invalid reference', E_USER_ERROR, $this->_file, $this->_linenum);
             }
         } else {
             $_result = "\$gTpl->_vars['$var_name']";
         }
+
         foreach ($variable as $var) {
             if ($var{0} == '[') {
                 $var = substr($var, 1, -1);
@@ -807,11 +827,11 @@ class gTemplateCompiler extends gTemplate {
                 } elseif ($var{0} == '#') {
                     $_result .= "[" . $this->_compile_config($var) . "]";
                 } else {
-//					$_result .= "['$var']";
-                    $parts = explode('.', $var);
-                    $section = $parts[0];
-                    $section_prop = isset($parts[1]) ? $parts[1] : 'index';
-                    $_result .= "[\$gTpl->_sections['$section']['$section_prop']]";
+                  $_result .= "['$var']";
+//                    $parts = explode('.', $var);
+//                    $section = $parts[0];
+//                    $section_prop = isset($parts[1]) ? $parts[1] : 'index';
+//                    $_result .= "[\$gTpl->_sections['$section']['$section_prop']]";
                 }
             } else if ($var{0} == '.') {
                 if ($var{1} == '$') {
@@ -821,10 +841,13 @@ class gTemplateCompiler extends gTemplate {
                 }
             } else if (substr($var, 0, 2) == '->') {
                 if (substr($var, 2, 2) == '__') {
-                    $this->trigger_error('call to internal object members is not allowed', E_USER_ERROR, __FILE__, __LINE__);
+                    $this->trigger_error('[COMPILER] call to internal object members is not allowed', E_USER_ERROR, $this->_file, $this->_linenum);
                 } else if (substr($var, 2, 1) == '$') {
-                    $_output .= '->{(($var=$gTpl->_vars[\'' . substr($var, 3) . '\']) && substr($var,0,2)!=\'__\') ? $_var : $gTpl->trigger_error("cannot access property \\"$var\\"")}';
+                    $_result .= '->{(($var=$gTpl->_vars[\'' . substr($var, 3) . '\']) && substr($var,0,2)!=\'__\') ? $_var : $gTpl->trigger_error("cannot access property \\"$var\\"")}';
+                } else {
+                    $_result .= $var;
                 }
+
             } else {
                 //$this->trigger_error('$' . $var_name.implode('', $variable) . ' is an invalid reference', E_USER_ERROR, __FILE__, __LINE__);
                 $_result .= ' . \'' . implode('', $variable) . '\'';
@@ -870,7 +893,7 @@ class gTemplateCompiler extends gTemplate {
                 }
                 $variable = "\$gTpl->_run_modifier($variable, '$_mods[$i]', '$php_function', $_map_array$_arg)";
             } else {
-                $variable = "\$gTpl->trigger_error(\"'" . $_mods[$i] . "' modifier does not exist\", E_USER_NOTICE, __FILE__, __LINE__);";
+                $this->trigger_error("[COMPILER] '" . $_mods[$i] . "' modifier does not exist", E_USER_NOTICE, $this->_file, $this->_linenum);
             }
         }
         return $variable;
@@ -885,11 +908,9 @@ class gTemplateCompiler extends gTemplate {
         $plugin_filepath = $this->_get_plugin_filepath($type, $function);
         if (file_exists($plugin_filepath)) {
             require_once($plugin_filepath);
-            foreach ($this->plugin_prefix AS $pfx) {
-                if (function_exists($pfx . '_' . $type . '_' . $function)) {
-                    $this->_require_stack[$type . '.' . $function . '.php'] = array($type, $function, $pfx . '_' . $type . '_' . $function);
-                    return ($pfx . '_' . $type . '_' . $function);
-                }
+            if (function_exists($this->plugin_prefix . '_' . $type . '_' . $function)) {
+                $this->_require_stack[$type . '.' . $function . '.php'] = array($type, $function, $this->plugin_prefix . '_' . $type . '_' . $function);
+                return ($this->plugin_prefix . '_' . $type . '_' . $function);
             }
         }
         // check for standard functions
@@ -910,7 +931,7 @@ class gTemplateCompiler extends gTemplate {
             $tag = array($tag);
         }
         if (!in_array($lastTag['tag'], $tag)) {
-            $this->trigger_error('Unexpected closing tag: <i>"' . $function . '"</i>! Missing ' . implode(' or ', $tag) . ' opening tag', E_USER_ERROR, __FILE__, __LINE__);
+            $this->trigger_error('[SYNTAX] Unexpected closing tag: '.$this->left_delimiter.$function.$this->right_delimiter.' found! Missing '.$this->left_delimiter.implode($this->right_delimiter.' or '.$this->left_delimiter, $tag).$this->right_delimiter. ' opening tag', E_USER_ERROR, $this->_file);
         }
 
         array_pop($this->_tag_stack);
